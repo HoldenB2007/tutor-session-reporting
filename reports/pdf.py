@@ -33,6 +33,33 @@ def _cell(value):
     return str(value)
 
 
+def _session_detail_flowables(groups, styles, body):
+    """Tutor → student → dated session rows, mirroring the paper form's per-student grid."""
+    if not groups:
+        return [Paragraph("No sessions in this period.", body), Spacer(1, 8)]
+    out = []
+    grid = TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#eeeeee")),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ("GRID", (0, 0), (-1, -1), 0.25, colors.grey),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+    ])
+    for g in groups:
+        out.append(Paragraph(f"{g['tutor']} — {g['hours']} h", styles["Heading4"]))
+        for sg in g["students"]:
+            out.append(Paragraph(f"<b>{sg['student']}</b> · {sg['subject']} — {sg['hours']} h, {len(sg['rows'])} dates", body))
+            data = [["Date", "Hours", "Absence", "Note"]] + [
+                [_cell(r["date"]), _cell(r["hours"]), _cell(r["absence"]), Paragraph(_cell(r["note"]), body)]
+                for r in sg["rows"]
+            ]
+            table = Table(data, repeatRows=1, colWidths=[1.4 * inch, 0.7 * inch, 1.2 * inch, None], hAlign="LEFT")
+            table.setStyle(grid)
+            out.extend([table, Spacer(1, 6)])
+        out.append(Spacer(1, 8))
+    return out
+
+
 def render_pdf(report):
     buf = BytesIO()
     doc = SimpleDocTemplate(
@@ -53,8 +80,11 @@ def render_pdf(report):
     ]
 
     for section in report["sections"]:
-        cols = COLUMNS[section["columns"]]
         story.append(Paragraph(section["heading"], styles["Heading3"]))
+        if section["columns"] == "session_detail":
+            story.extend(_session_detail_flowables(section["groups"], styles, body))
+            continue
+        cols = COLUMNS[section["columns"]]
         if not section["rows"]:
             story.append(Paragraph("No data in this period.", body))
             story.append(Spacer(1, 8))
