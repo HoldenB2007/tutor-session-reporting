@@ -51,3 +51,11 @@ class ReportForm(forms.Form):
             elif start > end:
                 self.add_error("end", "End must be after start.")
         return cleaned
+
+
+class SubscriptionForm(forms.ModelForm):
+    class Meta:
+        from .models import ReportSubscription
+
+        model = ReportSubscription
+        fields = ["email", "kind"]
