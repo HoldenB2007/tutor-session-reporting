@@ -125,8 +125,11 @@ STORAGES = {
 }
 
 MEDIA_URL = "/media/"
-# On Railway, mount a volume and point MEDIA_ROOT at it so uploads survive deploys.
-MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
+# Uploads must outlive deploys. On Railway a Volume is mounted into the container and its
+# path is exposed as RAILWAY_VOLUME_MOUNT_PATH; an explicit MEDIA_ROOT still wins.
+MEDIA_ROOT = Path(
+    os.environ.get("MEDIA_ROOT") or os.environ.get("RAILWAY_VOLUME_MOUNT_PATH") or (BASE_DIR / "media")
+)
 
 # --- Production security --------------------------------------------------
 
