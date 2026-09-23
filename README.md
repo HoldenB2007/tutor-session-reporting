@@ -63,6 +63,20 @@ Railway builds from `main`. The `Procfile` runs migrations and `collectstatic`, 
 Add a Postgres service and reference its `DATABASE_URL` in the web service's variables.
 After the first deploy, run `python manage.py seed_demo` once from the service shell.
 
+## Staff reports
+
+Staff log in and land on the report generator. Pick a report type, a single month or a date range, and
+**Generate** — the report is built from live data on the spot and shown on screen, with an **Export PDF**
+button that re-runs the same query into a PDF. Nothing is stored; every report is current as of the moment
+it's generated.
+
+| Report | Contents |
+|---|---|
+| All tutors | One row per tutor: students, active students, hours, sessions, absences, goals achieved |
+| One tutor and their students | One row per student with hours, sessions, TA/SA/H counts, goals achieved, status, plus totals |
+| One student | Their tutor(s) with the same columns, plus every session in the period |
+| Everything | Both of the above for the whole program |
+
 ## Design decisions
 
 ### Product
