@@ -2,6 +2,7 @@
 {% block title %}My students · Tutor Session Reporting{% endblock %}
 {% block content %}
   <h1>My students</h1>
+  <p class="muted"><a href="mailto:{{ staff_email }}?subject=From tutor {{ user.get_full_name|urlencode }}">Contact LVAEP staff</a></p>
 
   <form class="filters"
         hx-get="{% url 'tutor_grid' %}"

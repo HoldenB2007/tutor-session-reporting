@@ -60,7 +60,11 @@ def _filtered_assignments(request):
 @role_required(Role.TUTOR)
 def tutor_home(request):
     assignments, filters = _filtered_assignments(request)
-    return render(request, "tutoring/tutor_home.html", {"assignments": assignments, "filters": filters})
+    return render(
+        request,
+        "tutoring/tutor_home.html",
+        {"assignments": assignments, "filters": filters, "staff_email": settings.STAFF_CONTACT_EMAIL},
+    )
 
 
 @role_required(Role.TUTOR)
