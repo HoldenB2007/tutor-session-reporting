@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Report subscriptions · Tutor Session Reporting{% endblock %}
+{% block content %}
+  <p><a href="{% url 'staff_home' %}">← Reports</a></p>
+  <h1>Monthly report subscriptions</h1>
+  <p class="muted">
+    Sign an address up to receive a report category by email each month.
+    <strong>Delivery isn't switched on yet</strong> — this page records who should get what, so it's ready when it is.
+  </p>
+
+  <form method="post" class="report-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <p><label>Email<br>{{ form.email }}</label> {{ form.email.errors }}</p>
+    <p><label>Report<br>{{ form.kind }}</label> {{ form.kind.errors }}</p>
+    <button type="submit">Subscribe</button>
+  </form>
+
+  {% if subscriptions %}
+    <table>
+      <thead><tr><th>Email</th><th>Report</th><th>Added</th><th></th></tr></thead>
+      <tbody>
+        {% for s in subscriptions %}
+          <tr>
+            <td>{{ s.email }}</td><td>{{ s.get_kind_display }}</td><td>{{ s.created_at|date:"M j, Y" }}</td>
+            <td><form method="post">{% csrf_token %}<button class="link" name="delete" value="{{ s.pk }}">Remove</button></form></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">No subscriptions yet.</p>
+  {% endif %}
+{% endblock %}

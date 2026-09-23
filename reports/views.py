@@ -1,10 +1,12 @@
+from django.contrib import messages
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from accounts.decorators import role_required
 from accounts.models import Role
 
-from .forms import ReportForm
+from .forms import ReportForm, SubscriptionForm
+from .models import ReportSubscription
 from .pdf import render_pdf
 from .queries import build_report
 
@@ -44,3 +46,22 @@ def report_pdf(request):
     response = HttpResponse(render_pdf(report), content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response
+
+
+@role_required(Role.STAFF)
+def subscriptions(request):
+    """Sign an email up for a monthly report category. Storage only — delivery is a future step."""
+    form = SubscriptionForm(request.POST or None)
+    if request.method == "POST":
+        if "delete" in request.POST:
+            ReportSubscription.objects.filter(pk=request.POST["delete"]).delete()
+            return redirect("subscriptions")
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"{form.instance.email} will receive the “{form.instance.get_kind_display()}” report monthly once delivery is enabled.")
+            return redirect("subscriptions")
+    return render(
+        request,
+        "reports/subscriptions.html",
+        {"form": form, "subscriptions": ReportSubscription.objects.all()},
+    )

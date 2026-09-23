@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Reports · Tutor Session Reporting{% endblock %}
-{% block nav %}<a href="{% url 'admin:index' %}">Admin</a>{% endblock %}
 {% block content %}
   <h1>Reports</h1>
-  <p class="muted">Reports are generated from live data each time — nothing is stored.</p>
+  <p class="muted">Reports are generated from live data each time — nothing is stored.
+    <a href="{% url 'subscriptions' %}">Email subscriptions</a> · <a href="{% url 'admin:index' %}">Admin</a></p>
 
   <form method="get" class="report-form">
     {{ form.non_field_errors }}

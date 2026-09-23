@@ -77,6 +77,13 @@ it's generated.
 | One student | Their tutor(s) with the same columns, plus every session in the period |
 | Everything | Both of the above for the whole program |
 
+### Email subscriptions (placeholder)
+
+Staff can sign an address up for a report category at `/staff/subscriptions/`. Addresses are stored;
+nothing is sent yet. `python manage.py send_report_subscriptions` builds last month's report for each
+subscription and prints what *would* be delivered. Turning it on means adding an email backend and a
+monthly scheduler (GitHub Actions cron or a Railway cron job) that runs that command.
+
 ## Design decisions
 
 ### Product
