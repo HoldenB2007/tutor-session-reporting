@@ -123,6 +123,48 @@ def _tutor_rows(start, end, tutors=None):
     ]
 
 
+def _session_detail(assignments, start, end):
+    """
+    Every session in the period, grouped tutor → student → dated rows.
+    This is the electronic equivalent of the paper form's day-by-day grid.
+    """
+    sessions = (
+        Session.objects.filter(assignment__in=assignments, date__range=(start, end))
+        .select_related("assignment__tutor", "assignment__student")
+        .order_by("assignment__tutor__last_name", "assignment__student__last_name", "assignment__subject", "date")
+    )
+    groups = []
+    for s in sessions:
+        tutor_name = s.assignment.tutor.get_full_name()
+        if not groups or groups[-1]["tutor"] != tutor_name:
+            groups.append({"tutor": tutor_name, "students": [], "hours": Decimal("0")})
+        tutor_group = groups[-1]
+        key = (s.assignment.student_id, s.assignment.subject)
+        if not tutor_group["students"] or tutor_group["students"][-1]["key"] != key:
+            tutor_group["students"].append(
+                {
+                    "key": key,
+                    "student": s.assignment.student.get_full_name(),
+                    "subject": s.assignment.subject,
+                    "rows": [],
+                    "hours": Decimal("0"),
+                }
+            )
+        student_group = tutor_group["students"][-1]
+        student_group["rows"].append(
+            {
+                "date": s.date,
+                "hours": s.hours,
+                "absence": s.get_absence_display() if s.absence else "",
+                "note": s.note,
+            }
+        )
+        if s.hours:
+            student_group["hours"] += s.hours
+            tutor_group["hours"] += s.hours
+    return groups
+
+
 def build_report(kind, start, end, tutor_id=None, student_id=None):
     """Return a dict describing the report: title, period, and one or more sections of rows."""
     report = {"kind": kind, "period": _period_label(start, end), "start": start, "end": end, "sections": []}
@@ -134,9 +176,13 @@ def build_report(kind, start, end, tutor_id=None, student_id=None):
 
     elif kind == "tutor":
         tutor = User.objects.get(pk=tutor_id, profile__role=Role.TUTOR)
-        rows = _assignment_rows(Assignment.objects.filter(tutor=tutor), start, end)
+        assignments = Assignment.objects.filter(tutor=tutor)
+        rows = _assignment_rows(assignments, start, end)
         report["title"] = f"Tutor: {tutor.get_full_name()}"
         report["sections"].append({"heading": "Students", "columns": "assignment", "rows": rows, "totals": _totals(rows)})
+        report["sections"].append(
+            {"heading": "Session detail", "columns": "session_detail", "groups": _session_detail(assignments, start, end)}
+        )
 
     elif kind == "student":
         student = User.objects.get(pk=student_id, profile__role=Role.STUDENT)
@@ -170,6 +216,13 @@ def build_report(kind, start, end, tutor_id=None, student_id=None):
         report["title"] = "All tutors and students"
         report["sections"].append({"heading": "Tutors", "columns": "tutor", "rows": tutor_rows})
         report["sections"].append({"heading": "Tutor–student pairs", "columns": "assignment", "rows": rows, "totals": _totals(rows)})
+        report["sections"].append(
+            {
+                "heading": "Session detail — every session, by tutor and student",
+                "columns": "session_detail",
+                "groups": _session_detail(Assignment.objects.all(), start, end),
+            }
+        )
 
     else:
         raise ValueError(f"Unknown report kind: {kind}")
