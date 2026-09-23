@@ -1,13 +1,96 @@
 {% extends "base.html" %}
 {% block title %}Reports · Tutor Session Reporting{% endblock %}
+{% block nav %}<a href="{% url 'admin:index' %}">Admin</a>{% endblock %}
 {% block content %}
   <h1>Reports</h1>
-  <ul>
-    <li>Tutors: {{ tutor_count }}</li>
-    <li>Students: {{ student_count }}</li>
-    <li>Active assignments: {{ active_assignments }}</li>
-    <li>Sessions logged: {{ session_count }}</li>
-  </ul>
-  <p>Monthly and rolling report generation is coming next.</p>
-  <p><a href="{% url 'admin:index' %}">Manage accounts and assignments (admin)</a></p>
+  <p class="muted">Reports are generated from live data each time — nothing is stored.</p>
+
+  <form method="get" class="report-form">
+    {{ form.non_field_errors }}
+    <p><label>{{ form.kind.label }}<br>{{ form.kind }}</label></p>
+    <p class="needs-tutor"><label>Tutor<br>{{ form.tutor }}</label> {{ form.tutor.errors }}</p>
+    <p class="needs-student"><label>Student<br>{{ form.student }}</label> {{ form.student.errors }}</p>
+    <fieldset>
+      <legend>Period</legend>
+      {{ form.period }}
+      <p class="period-month"><label>Month<br>{{ form.month }}</label> {{ form.month.errors }}</p>
+      <p class="period-range">
+        <label>{{ form.start.label }} {{ form.start }}</label>
+        <label>{{ form.end.label }} {{ form.end }}</label>
+        {{ form.start.errors }} {{ form.end.errors }}
+      </p>
+    </fieldset>
+    <button type="submit">Generate</button>
+  </form>
+
+  {% if report %}
+    <section class="report">
+      <header class="report-header">
+        <div>
+          <h2>{{ report.title }}</h2>
+          <p class="muted">{{ report.period }}</p>
+        </div>
+        <a class="button" href="{% url 'report_pdf' %}?{{ query }}">Export PDF</a>
+      </header>
+
+      {% for section in report.sections %}
+        <h3>{{ section.heading }}</h3>
+        {% if not section.rows %}
+          <p class="muted">No data in this period.</p>
+        {% elif section.columns == "tutor" %}
+          <table>
+            <thead><tr><th>Tutor</th><th>Students</th><th>Active</th><th>Hours</th><th>Sessions</th><th>Absences</th><th>Goals achieved</th></tr></thead>
+            <tbody>
+              {% for r in section.rows %}
+                <tr><td>{{ r.tutor }}</td><td>{{ r.students }}</td><td>{{ r.active_students }}</td><td>{{ r.hours }}</td><td>{{ r.sessions }}</td><td>{{ r.absences }}</td><td>{{ r.goals }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% elif section.columns == "assignment" %}
+          <table>
+            <thead><tr><th>Tutor</th><th>Student</th><th>Subject</th><th>Site</th><th>Hours</th><th>Sessions</th><th title="Tutor absent">TA</th><th title="Student absent">SA</th><th title="Holiday">H</th><th>Goals achieved</th><th>Status</th></tr></thead>
+            <tbody>
+              {% for r in section.rows %}
+                <tr class="{% if r.ended_in_period %}ended{% endif %}">
+                  <td>{{ r.tutor }}</td><td>{{ r.student }}</td><td>{{ r.subject }}</td><td>{{ r.site }}</td>
+                  <td>{{ r.hours }}</td><td>{{ r.sessions }}</td><td>{{ r.tutor_absent }}</td><td>{{ r.student_absent }}</td><td>{{ r.holidays }}</td>
+                  <td>{% for g in r.goals %}{{ g }}{% if not forloop.last %}; {% endif %}{% empty %}—{% endfor %}</td>
+                  <td>{{ r.status }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+            {% with t=section.totals %}
+              <tfoot><tr><th colspan="4">Total</th><th>{{ t.hours }}</th><th>{{ t.sessions }}</th><th>{{ t.tutor_absent }}</th><th>{{ t.student_absent }}</th><th>{{ t.holidays }}</th><th>{{ t.goals }} achieved</th><th>{{ t.ended }} ended</th></tr></tfoot>
+            {% endwith %}
+          </table>
+        {% elif section.columns == "session" %}
+          <table>
+            <thead><tr><th>Date</th><th>Tutor</th><th>Hours</th><th>Absence</th><th>Note</th></tr></thead>
+            <tbody>
+              {% for r in section.rows %}
+                <tr><td>{{ r.date|date:"D, M j, Y" }}</td><td>{{ r.tutor }}</td><td>{{ r.hours|default_if_none:"—" }}</td><td>{{ r.absence }}</td><td>{{ r.note }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  <script>
+    // Show only the selectors and period inputs that apply to the chosen options.
+    (function () {
+      const form = document.querySelector(".report-form");
+      const sync = () => {
+        const kind = form.kind.value;
+        form.querySelector(".needs-tutor").hidden = kind !== "tutor";
+        form.querySelector(".needs-student").hidden = kind !== "student";
+        const period = form.querySelector("[name=period]:checked")?.value || "month";
+        form.querySelector(".period-month").hidden = period !== "month";
+        form.querySelector(".period-range").hidden = period !== "range";
+      };
+      form.addEventListener("change", sync);
+      sync();
+    })();
+  </script>
 {% endblock %}
