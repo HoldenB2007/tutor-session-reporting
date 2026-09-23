@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.db.models import Count, Max, Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -71,15 +72,29 @@ def tutor_grid(request):
 
 @role_required(Role.STUDENT)
 def student_home(request):
-    assignments = _with_totals(Assignment.objects.filter(student=request.user)).prefetch_related(
-        "achievements__goal"
+    """
+    Sidebar lists every tutor this student has (active and ended); the main panel
+    shows the selected assignment's hours, sessions, goals, and meeting details.
+    """
+    assignments = list(
+        _with_totals(Assignment.objects.filter(student=request.user)).order_by("ended_on", "tutor__last_name")
     )
     total_hours = sum((a.total_hours or 0) for a in assignments)
-    return render(
-        request,
-        "tutoring/student_home.html",
-        {"assignments": assignments, "total_hours": total_hours},
-    )
+
+    selected = None
+    if assignments:
+        wanted = request.GET.get("a")
+        selected = next((a for a in assignments if str(a.pk) == wanted), assignments[0])
+
+    context = {
+        "assignments": assignments,
+        "total_hours": total_hours,
+        "selected": selected,
+        "sessions": selected.sessions.all()[:25] if selected else [],
+        "achievements": selected.achievements.select_related("goal") if selected else [],
+        "staff_email": settings.STAFF_CONTACT_EMAIL,
+    }
+    return render(request, "tutoring/student_home.html", context)
 
 
 # --- Tutor popup actions ---------------------------------------------------------

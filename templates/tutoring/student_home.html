@@ -1,30 +1,77 @@
 {% extends "base.html" %}
 {% block title %}My tutoring · Tutor Session Reporting{% endblock %}
 {% block content %}
-  <h1>My tutoring</h1>
-  <p><strong>Total hours tutored:</strong> {{ total_hours }}</p>
-
-  {% for a in assignments %}
-    <section>
-      <h2>{{ a.tutor.get_full_name }} — {{ a.subject }}
-        {% if not a.is_active %}<small>(ended {{ a.ended_on|date:"M j, Y" }})</small>{% endif %}
-      </h2>
-      <ul>
-        <li>Where: {{ a.site|default:"—" }}</li>
-        <li>When: {{ a.days|default:"—" }} {{ a.times }}</li>
-        <li>Hours so far: {{ a.total_hours|default:0 }}</li>
-        <li>Last session: {{ a.last_session|date:"M j, Y"|default:"—" }}</li>
+<div class="two-col">
+  <aside class="sidebar">
+    <h2>My tutors</h2>
+    {% if assignments %}
+      <ul class="tutor-list">
+        {% for a in assignments %}
+          <li class="{% if a == selected %}selected{% endif %} {% if not a.is_active %}ended{% endif %}">
+            <a href="?a={{ a.pk }}">
+              <strong>{{ a.tutor.get_full_name }}</strong><br>
+              <small>{{ a.subject }}{% if not a.is_active %} · ended{% endif %}</small>
+            </a>
+          </li>
+        {% endfor %}
       </ul>
-      {% if a.achievements.all %}
-        <p>Goals achieved:</p>
+    {% else %}
+      <p>You aren't assigned to a tutor yet.</p>
+    {% endif %}
+    <p><strong>Total hours:</strong> {{ total_hours }}</p>
+    <p><a href="mailto:{{ staff_email }}?subject=Question from {{ user.get_full_name|urlencode }}">Contact LVAEP staff</a></p>
+  </aside>
+
+  <section class="detail">
+    {% if selected %}
+      <h1>{{ selected.tutor.get_full_name }} <small>· {{ selected.subject }}</small></h1>
+      {% if not selected.is_active %}
+        <p class="badge">Tutoring ended {{ selected.ended_on|date:"F j, Y" }}</p>
+      {% endif %}
+      <p>
+        <a class="button" href="mailto:{{ selected.tutor.email }}?subject={{ selected.subject|urlencode }} tutoring">Email {{ selected.tutor.first_name }}</a>
+      </p>
+
+      <dl class="facts">
+        <dt>Where</dt><dd>{{ selected.site|default:"—" }}</dd>
+        <dt>When</dt><dd>{{ selected.days|default:"—" }} {{ selected.times }}</dd>
+        <dt>Hours so far</dt><dd>{{ selected.total_hours|default:0 }}</dd>
+        <dt>Sessions</dt><dd>{{ sessions|length }}{% if sessions|length == 25 %}+{% endif %} · {{ selected.absence_count }} missed</dd>
+        <dt>Started</dt><dd>{{ selected.started_on|date:"M j, Y" }}</dd>
+      </dl>
+
+      <h2>Goals achieved</h2>
+      {% if achievements %}
         <ul>
-          {% for ach in a.achievements.all %}
+          {% for ach in achievements %}
             <li>{{ ach.goal.label }} <small>({{ ach.achieved_on|date:"M j, Y" }})</small></li>
           {% endfor %}
         </ul>
+      {% else %}
+        <p class="muted">None checked off yet — keep going!</p>
       {% endif %}
-    </section>
-  {% empty %}
-    <p>You aren't assigned to a tutor yet.</p>
-  {% endfor %}
+
+      <h2>Recent sessions</h2>
+      {% if sessions %}
+        <table>
+          <thead><tr><th>Date</th><th>Hours</th><th>Note</th></tr></thead>
+          <tbody>
+            {% for s in sessions %}
+              <tr>
+                <td>{{ s.date|date:"D, M j" }}</td>
+                <td>{% if s.is_absence %}<em>{{ s.get_absence_display }}</em>{% else %}{{ s.hours }}{% endif %}</td>
+                <td>{{ s.note }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted">No sessions logged yet.</p>
+      {% endif %}
+    {% else %}
+      <h1>My tutoring</h1>
+      <p>Once staff pair you with a tutor, your hours and goals will show here.</p>
+    {% endif %}
+  </section>
+</div>
 {% endblock %}
