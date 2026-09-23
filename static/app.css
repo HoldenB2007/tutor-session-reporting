@@ -1,5 +1,13 @@
 /* Minimal, functional styles. Visual design is a later pass. */
 body { font-family: system-ui, sans-serif; margin: 0; color: #222; }
+
+/* Buttons: make anything clickable obviously clickable. */
+button, .button, input[type="submit"] { cursor: pointer; border: 1px solid #999; background: #f2f2f2; padding: 0.4rem 0.8rem; font: inherit; color: inherit; border-radius: 3px; transition: background 0.1s, border-color 0.1s, box-shadow 0.1s; }
+button:hover, .button:hover, input[type="submit"]:hover { background: #e4e4e4; border-color: #333; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.12); }
+button:focus-visible, .button:focus-visible, .card:focus-visible { outline: 2px solid #2b6cb0; outline-offset: 2px; }
+.link:hover { text-decoration: underline; background: none; border: none; box-shadow: none; }
+.danger:hover { background: #a93226; border-color: #7b241c; box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.3); }
+a:hover { text-decoration: underline; }
 header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #ddd; }
 header a { color: inherit; text-decoration: none; }
 .me { display: inline-flex; align-items: center; gap: 0.5rem; margin-right: 0.75rem; }
@@ -18,7 +26,7 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
 .card { display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-start; text-align: left;
         padding: 0.75rem; border: 1px solid #bbb; background: #fff; font: inherit; cursor: pointer; }
-.card:hover { border-color: #333; }
+.card:hover { border-color: #333; box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.12); }
 .card-ended { opacity: 0.6; }
 .badge { font-size: 0.8em; padding: 0.1rem 0.4rem; border: 1px solid currentColor; }
 
