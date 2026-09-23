@@ -27,3 +27,11 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
 .muted { color: #666; }
 .check { display: block; }
 fieldset { border: 1px solid #ddd; margin: 0.5rem 0; }
+
+/* Staff reports */
+.report-form { border: 1px solid #ddd; padding: 0.75rem 1rem; margin-bottom: 1.5rem; }
+.report-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid #ccc; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
+th { background: #f2f2f2; }
+tr.ended td { color: #777; }
