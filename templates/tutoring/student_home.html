@@ -2,5 +2,29 @@
 {% block title %}My tutoring · Tutor Session Reporting{% endblock %}
 {% block content %}
   <h1>My tutoring</h1>
-  <p>Your tutors, hours, and goals will appear here.</p>
+  <p><strong>Total hours tutored:</strong> {{ total_hours }}</p>
+
+  {% for a in assignments %}
+    <section>
+      <h2>{{ a.tutor.get_full_name }} — {{ a.subject }}
+        {% if not a.is_active %}<small>(ended {{ a.ended_on|date:"M j, Y" }})</small>{% endif %}
+      </h2>
+      <ul>
+        <li>Where: {{ a.site|default:"—" }}</li>
+        <li>When: {{ a.days|default:"—" }} {{ a.times }}</li>
+        <li>Hours so far: {{ a.total_hours|default:0 }}</li>
+        <li>Last session: {{ a.last_session|date:"M j, Y"|default:"—" }}</li>
+      </ul>
+      {% if a.achievements.all %}
+        <p>Goals achieved:</p>
+        <ul>
+          {% for ach in a.achievements.all %}
+            <li>{{ ach.goal.label }} <small>({{ ach.achieved_on|date:"M j, Y" }})</small></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </section>
+  {% empty %}
+    <p>You aren't assigned to a tutor yet.</p>
+  {% endfor %}
 {% endblock %}
