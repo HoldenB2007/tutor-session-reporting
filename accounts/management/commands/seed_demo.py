@@ -47,7 +47,8 @@ class Command(BaseCommand):
             user.first_name = spec["first_name"]
             user.last_name = spec["last_name"]
             user.email = f"{spec['username']}@example.org"
-            user.is_staff = spec["role"] == Role.STAFF  # staff get Django admin access
+            # The shared staff account manages everything in the Django admin.
+            user.is_staff = user.is_superuser = spec["role"] == Role.STAFF
             user.set_password(DEMO_PASSWORD)
             user.save()
             Profile.objects.update_or_create(user=user, defaults={"role": spec["role"]})
