@@ -1,0 +1,20 @@
+{% include "tutoring/partials/_modal_header.html" %}
+<h3>Goal progress</h3>
+<p class="muted">Check each goal when the student attains it. Starred goals are federally reported.</p>
+<form hx-post="{% url 'update_goals' a.pk %}" hx-target="#modal">
+  {% csrf_token %}
+  {% for category, items in groups.items %}
+    {% if items %}
+      <fieldset>
+        <legend>{{ category }}</legend>
+        {% for choice, goal in items %}
+          <label class="check">{{ choice.tag }} {% if goal.federally_reported %}*{% endif %}{{ goal.label }}</label>
+        {% endfor %}
+      </fieldset>
+    {% endif %}
+  {% endfor %}
+  <footer class="modal-footer">
+    <button type="button" class="link" hx-get="{% url 'assignment_menu' a.pk %}" hx-target="#modal">← Back</button>
+    <button type="submit">Update</button>
+  </footer>
+</form>

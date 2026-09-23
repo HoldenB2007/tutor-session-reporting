@@ -1,0 +1,9 @@
+{% if assignments %}
+  <div class="grid">
+    {% for a in assignments %}
+      {% include "tutoring/partials/student_card.html" %}
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No students match.</p>
+{% endif %}

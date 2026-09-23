@@ -1,0 +1,17 @@
+{% include "tutoring/partials/_modal_header.html" %}
+<h3>Log session</h3>
+<form hx-post="{% url 'log_session' a.pk %}" hx-target="#modal">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <p><label>{{ form.date.label }}<br>{{ form.date }}</label> {{ form.date.errors }}</p>
+  <p><label>{{ form.hours.label }}<br>{{ form.hours }}</label> {{ form.hours.errors }}</p>
+  <fieldset>
+    <legend>{{ form.absence.label }}</legend>
+    {{ form.absence }}
+  </fieldset>
+  <p><label>{{ form.note.label }}<br>{{ form.note }}</label></p>
+  <footer class="modal-footer">
+    <button type="button" class="link" hx-get="{% url 'assignment_menu' a.pk %}" hx-target="#modal">← Back</button>
+    <button type="submit">Update</button>
+  </footer>
+</form>
