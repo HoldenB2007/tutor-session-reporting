@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}My profile · Tutor Session Reporting{% endblock %}
+{% block content %}
+  <h1>My profile</h1>
+  <p>{{ user.get_full_name }} · {{ user.profile.get_role_display }}</p>
+
+  <form method="post" enctype="multipart/form-data" class="profile-form">
+    {% csrf_token %}
+    <div class="avatar avatar-lg">
+      {% if user.profile.image %}<img src="{{ user.profile.image.url }}" alt="">{% else %}<span>{{ user.first_name|first }}{{ user.last_name|first }}</span>{% endif %}
+    </div>
+    <p><label>{{ form.image.label }}<br>{{ form.image }}</label> {{ form.image.errors }}</p>
+    <p><label>{{ form.pronouns.label }}<br>{{ form.pronouns }}</label> {{ form.pronouns.errors }}</p>
+    <button type="submit">Update</button>
+    <a href="{% url 'home' %}">Cancel</a>
+  </form>
+{% endblock %}
