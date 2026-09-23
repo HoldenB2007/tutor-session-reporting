@@ -124,6 +124,28 @@ def assignment_menu(request, pk):
 
 
 @role_required(Role.TUTOR)
+def session_history(request, pk):
+    """Read-only log of every session and goal for this student, newest first, with monthly hour totals."""
+    assignment = _own_assignment(request, pk)
+    sessions = list(assignment.sessions.all())
+    months = []
+    for s in sessions:
+        key = s.date.strftime("%B %Y")
+        if not months or months[-1]["label"] != key:
+            months.append({"label": key, "rows": [], "hours": 0, "absences": 0})
+        months[-1]["rows"].append(s)
+        if s.hours:
+            months[-1]["hours"] += s.hours
+        else:
+            months[-1]["absences"] += 1
+    return render(
+        request,
+        "tutoring/partials/history.html",
+        {"a": assignment, "months": months, "achievements": assignment.achievements.select_related("goal")},
+    )
+
+
+@role_required(Role.TUTOR)
 def log_session(request, pk):
     assignment = _own_assignment(request, pk)
     form = SessionForm(request.POST or None)
