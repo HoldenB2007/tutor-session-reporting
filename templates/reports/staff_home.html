@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Reports · Tutor Session Reporting{% endblock %}
+{% block content %}
+  <h1>Reports</h1>
+  <ul>
+    <li>Tutors: {{ tutor_count }}</li>
+    <li>Students: {{ student_count }}</li>
+    <li>Active assignments: {{ active_assignments }}</li>
+    <li>Sessions logged: {{ session_count }}</li>
+  </ul>
+  <p>Monthly and rolling report generation is coming next.</p>
+  <p><a href="{% url 'admin:index' %}">Manage accounts and assignments (admin)</a></p>
+{% endblock %}

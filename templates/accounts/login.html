@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Log in · Tutor Session Reporting{% endblock %}
+{% block content %}
+  <h1>Log in</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <p>
+      <label for="{{ form.username.id_for_label }}">Username</label><br>
+      {{ form.username }}
+    </p>
+    <p>
+      <label for="{{ form.password.id_for_label }}">Password</label><br>
+      {{ form.password }}
+    </p>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit">Log in</button>
+  </form>
+
+  {% if demo_accounts %}
+    <section>
+      <h2>Demo accounts</h2>
+      <p>All demo accounts use the password <code>{{ demo_password }}</code>.</p>
+      <table>
+        <thead><tr><th>Role</th><th>Username</th><th>Name</th></tr></thead>
+        <tbody>
+          {% for account in demo_accounts %}
+            <tr>
+              <td>{{ account.role|capfirst }}</td>
+              <td><code>{{ account.username }}</code></td>
+              <td>{{ account.first_name }} {{ account.last_name }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  {% endif %}
+{% endblock %}

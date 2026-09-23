@@ -22,10 +22,25 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 python manage.py migrate
+python manage.py seed_demo
 python manage.py runserver
 ```
 
 Then open http://localhost:8000. Health check: http://localhost:8000/healthz/
+
+## Demo accounts
+
+`python manage.py seed_demo` creates one account per role plus sample assignments, ~2.5 months of
+sessions (including absences), a few achieved goals, and one ended assignment. It is safe to re-run.
+With `SHOW_DEMO_CREDENTIALS=1` the login page lists these accounts.
+
+| Role | Username | Password |
+|---|---|---|
+| Staff | `staff` | `demo1234` |
+| Tutor | `tutor.maria`, `tutor.james` | `demo1234` |
+| Student | `student.ana`, `student.wei`, `student.samuel`, `student.fatima` | `demo1234` |
+
+The staff account also has access to the Django admin at `/admin/` for creating real accounts and assignments.
 
 ## Environment variables
 
@@ -46,6 +61,7 @@ Then open http://localhost:8000. Health check: http://localhost:8000/healthz/
 
 Railway builds from `main`. The `Procfile` runs migrations and `collectstatic`, then starts Gunicorn.
 Add a Postgres service and reference its `DATABASE_URL` in the web service's variables.
+After the first deploy, run `python manage.py seed_demo` once from the service shell.
 
 ## Design decisions
 

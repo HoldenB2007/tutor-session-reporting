@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}My students · Tutor Session Reporting{% endblock %}
+{% block content %}
+  <h1>My students</h1>
+
+  {% if assignments %}
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th><th>Subject</th><th>Site</th><th>Days / times</th>
+          <th>Hours</th><th>Absences</th><th>Last session</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in assignments %}
+          <tr>
+            <td>{{ a.student.get_full_name }}</td>
+            <td>{{ a.subject }}</td>
+            <td>{{ a.site }}</td>
+            <td>{{ a.days }} {{ a.times }}</td>
+            <td>{{ a.total_hours|default:0 }}</td>
+            <td>{{ a.absence_count }}</td>
+            <td>{{ a.last_session|date:"M j, Y"|default:"—" }}</td>
+            <td>{% if a.is_active %}Active{% else %}Ended {{ a.ended_on|date:"M j, Y" }}{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>You have no students assigned yet. Staff assign students from the admin.</p>
+  {% endif %}
+{% endblock %}
