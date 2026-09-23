@@ -1,5 +1,8 @@
 {% include "tutoring/partials/_modal_header.html" %}
 <p class="muted">{{ a.site|default:"No site set" }} · {{ a.days }} {{ a.times }}</p>
+{% if a.student.email %}
+  <p><a class="button" href="mailto:{{ a.student.email }}?subject={{ a.subject|urlencode }} tutoring">Email {{ a.student.first_name }}</a></p>
+{% endif %}
 <p class="muted">{{ a.total_hours|default:0 }} hours · {{ a.absence_count }} absence{{ a.absence_count|pluralize }} · last session {{ a.last_session|date:"M j, Y"|default:"—" }}</p>
 
 {% if a.is_active %}
