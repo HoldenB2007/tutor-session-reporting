@@ -8,6 +8,16 @@ button:focus-visible, .button:focus-visible, .card:focus-visible { outline: 2px 
 .link:hover { text-decoration: underline; background: none; border: none; box-shadow: none; }
 .danger:hover { background: #a93226; border-color: #7b241c; box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.3); }
 a:hover { text-decoration: underline; }
+
+/* Anything interactive that isn't a plain underlined link gets a visible hover/focus. */
+.me:hover, header > a:hover { text-decoration: none; background: #eee; border-radius: 4px; box-shadow: 0 0 0 4px #eee; }
+.tutor-list li:hover { border-color: #333; background: #f7f7f7; cursor: pointer; }
+.tutor-list li.selected:hover { background: #eee; }
+label.check:hover, .check label:hover, fieldset label:hover { background: #f2f2f2; cursor: pointer; border-radius: 3px; }
+input[type="checkbox"], input[type="radio"], select, input[type="date"], input[type="month"], input[type="file"] { cursor: pointer; }
+input:hover, select:hover, textarea:hover { border-color: #333; }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #2b6cb0; outline-offset: 1px; }
+input, select, textarea { border: 1px solid #aaa; border-radius: 3px; padding: 0.3rem 0.4rem; font: inherit; }
 header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #ddd; }
 header a { color: inherit; text-decoration: none; }
 .me { display: inline-flex; align-items: center; gap: 0.5rem; margin-right: 0.75rem; }
