@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Tutor Session Reporting{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}">
+  <script src="{% static 'htmx.min.js' %}" defer></script>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <header>
+    <a href="{% url 'home' %}"><strong>LVAEP Tutoring</strong></a>
+    <nav>
+      {% block nav %}{% endblock %}
+    </nav>
+  </header>
+
+  <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Single modal target; HTMX swaps popup content into it. -->
+  <dialog id="modal"></dialog>
+</body>
+</html>

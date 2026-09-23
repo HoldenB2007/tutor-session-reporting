@@ -1,0 +1,9 @@
+/* Minimal, functional styles. Visual design is a later pass. */
+body { font-family: system-ui, sans-serif; margin: 0; color: #222; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #ddd; }
+header a { color: inherit; text-decoration: none; }
+main { padding: 1rem; max-width: 1100px; margin: 0 auto; }
+.messages { list-style: none; padding: 0; }
+.messages li { padding: 0.5rem 0.75rem; border: 1px solid #ccc; margin-bottom: 0.5rem; }
+dialog { border: 1px solid #999; padding: 1rem; min-width: 320px; }
+dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
