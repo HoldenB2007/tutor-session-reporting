@@ -1,0 +1,7 @@
+<button type="button" class="card {% if not a.is_active %}card-ended{% endif %}" id="assignment-{{ a.pk }}">
+  <strong>{{ a.student.get_full_name }}</strong>
+  <span>{{ a.subject }}</span>
+  <span>{{ a.total_hours|default:0 }} h · {{ a.absence_count }} absence{{ a.absence_count|pluralize }}</span>
+  <span>Last: {{ a.last_session|date:"M j"|default:"—" }}</span>
+  {% if not a.is_active %}<span class="badge">Ended {{ a.ended_on|date:"M j, Y" }}</span>{% endif %}
+</button>

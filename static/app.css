@@ -7,3 +7,12 @@ main { padding: 1rem; max-width: 1100px; margin: 0 auto; }
 .messages li { padding: 0.5rem 0.75rem; border: 1px solid #ccc; margin-bottom: 0.5rem; }
 dialog { border: 1px solid #999; padding: 1rem; min-width: 320px; }
 dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
+
+/* Tutor dashboard */
+.filters { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; margin-bottom: 1rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
+.card { display: flex; flex-direction: column; gap: 0.25rem; align-items: flex-start; text-align: left;
+        padding: 0.75rem; border: 1px solid #bbb; background: #fff; font: inherit; cursor: pointer; }
+.card:hover { border-color: #333; }
+.card-ended { opacity: 0.6; }
+.badge { font-size: 0.8em; padding: 0.1rem 0.4rem; border: 1px solid currentColor; }
