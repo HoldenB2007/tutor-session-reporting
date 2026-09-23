@@ -17,6 +17,7 @@ class UserAdmin(DjangoUserAdmin):
     inlines = [ProfileInline]
     list_display = ("username", "first_name", "last_name", "email", "role")
     list_filter = ("profile__role", "is_active")
+    search_fields = ("username", "first_name", "last_name", "email")
 
     @admin.display(description="Role")
     def role(self, obj):
