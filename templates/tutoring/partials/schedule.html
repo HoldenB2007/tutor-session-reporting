@@ -1,0 +1,10 @@
+{% include "tutoring/partials/_modal_header.html" %}
+<h3>Site, days &amp; times</h3>
+<form hx-post="{% url 'update_schedule' a.pk %}" hx-target="#modal">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <footer class="modal-footer">
+    <button type="button" class="link" hx-get="{% url 'assignment_menu' a.pk %}" hx-target="#modal">← Back</button>
+    <button type="submit">Update</button>
+  </footer>
+</form>

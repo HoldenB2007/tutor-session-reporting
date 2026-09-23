@@ -32,5 +32,15 @@
 
   <!-- Single modal target; HTMX swaps popup content into it. -->
   <dialog id="modal"></dialog>
+  <script>
+    // Open the dialog whenever HTMX swaps content into it; close on request.
+    document.body.addEventListener("htmx:afterSwap", (e) => {
+      if (e.detail.target.id === "modal") document.getElementById("modal").showModal();
+    });
+    document.body.addEventListener("closeModal", () => document.getElementById("modal").close());
+    document.getElementById("modal").addEventListener("click", (e) => {
+      if (e.target.tagName === "DIALOG") e.target.close();  // click on backdrop
+    });
+  </script>
 </body>
 </html>

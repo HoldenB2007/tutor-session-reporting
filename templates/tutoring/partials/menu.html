@@ -1,0 +1,15 @@
+{% include "tutoring/partials/_modal_header.html" %}
+<p class="muted">{{ a.site|default:"No site set" }} · {{ a.days }} {{ a.times }}</p>
+<p class="muted">{{ a.total_hours|default:0 }} hours · {{ a.absence_count }} absence{{ a.absence_count|pluralize }} · last session {{ a.last_session|date:"M j, Y"|default:"—" }}</p>
+
+{% if a.is_active %}
+  <div class="actions">
+    <button hx-get="{% url 'log_session' a.pk %}" hx-target="#modal">Log session</button>
+    <button hx-get="{% url 'update_goals' a.pk %}" hx-target="#modal">Update goal progress</button>
+    <button hx-get="{% url 'update_schedule' a.pk %}" hx-target="#modal">Update site / days / times</button>
+    <button hx-get="{% url 'end_tutoring' a.pk %}" hx-target="#modal" class="danger">End tutoring</button>
+  </div>
+{% else %}
+  <p><strong>Tutoring ended.</strong> {{ a.end_reason|default:"No reason recorded." }}</p>
+  <p class="muted">Contact the office if this assignment should be reopened.</p>
+{% endif %}

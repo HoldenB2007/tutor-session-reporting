@@ -1,0 +1,14 @@
+{% include "tutoring/partials/_modal_header.html" %}
+<h3>End tutoring</h3>
+<p>This marks the student as no longer being tutored by you. Staff will see it on their next report.</p>
+<form hx-post="{% url 'end_tutoring' a.pk %}" hx-target="#modal">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <p><label>{{ form.ended_on.label }}<br>{{ form.ended_on }}</label> {{ form.ended_on.errors }}</p>
+  <p><label>{{ form.end_reason.label }}<br>{{ form.end_reason }}</label> {{ form.end_reason.errors }}</p>
+  <p class="check"><label>{{ form.confirm }} {{ form.confirm.label }}</label> {{ form.confirm.errors }}</p>
+  <footer class="modal-footer">
+    <button type="button" class="link" hx-get="{% url 'assignment_menu' a.pk %}" hx-target="#modal">← Back</button>
+    <button type="submit" class="danger">END</button>
+  </footer>
+</form>

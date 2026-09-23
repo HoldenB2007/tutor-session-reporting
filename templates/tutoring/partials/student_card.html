@@ -1,4 +1,5 @@
-<button type="button" class="card {% if not a.is_active %}card-ended{% endif %}" id="assignment-{{ a.pk }}">
+<button type="button" class="card {% if not a.is_active %}card-ended{% endif %}" id="assignment-{{ a.pk }}"
+        hx-get="{% url 'assignment_menu' a.pk %}" hx-target="#modal">
   <strong>{{ a.student.get_full_name }}</strong>
   <span>{{ a.subject }}</span>
   <span>{{ a.total_hours|default:0 }} h · {{ a.absence_count }} absence{{ a.absence_count|pluralize }}</span>

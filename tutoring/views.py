@@ -1,12 +1,14 @@
 import datetime
 
 from django.db.models import Count, Max, Q, Sum
-from django.shortcuts import render
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
 
 from accounts.decorators import role_required
 from accounts.models import Role
 
-from .models import Assignment
+from .forms import EndForm, GoalsForm, ScheduleForm, SessionForm
+from .models import Assignment, GoalCategory
 
 
 def _with_totals(queryset):
@@ -78,3 +80,71 @@ def student_home(request):
         "tutoring/student_home.html",
         {"assignments": assignments, "total_hours": total_hours},
     )
+
+
+# --- Tutor popup actions ---------------------------------------------------------
+# Every action loads into the shared <dialog> via HTMX. On success the view returns
+# 204 with HX-Trigger so the page closes the modal and refreshes the grid.
+
+
+def _own_assignment(request, pk):
+    """Scope every lookup to the logged-in tutor so IDs can't be guessed across tutors."""
+    return get_object_or_404(_with_totals(Assignment.objects.filter(tutor=request.user)), pk=pk)
+
+
+def _done():
+    response = HttpResponse(status=204)
+    response["HX-Trigger"] = "closeModal, refreshGrid"
+    return response
+
+
+@role_required(Role.TUTOR)
+def assignment_menu(request, pk):
+    assignment = _own_assignment(request, pk)
+    return render(request, "tutoring/partials/menu.html", {"a": assignment})
+
+
+@role_required(Role.TUTOR)
+def log_session(request, pk):
+    assignment = _own_assignment(request, pk)
+    form = SessionForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.instance.assignment = assignment
+        form.save()
+        return _done()
+    return render(request, "tutoring/partials/log_session.html", {"a": assignment, "form": form})
+
+
+@role_required(Role.TUTOR)
+def update_goals(request, pk):
+    assignment = _own_assignment(request, pk)
+    form = GoalsForm(assignment, request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return _done()
+    # Group the checkbox widgets by category so the template mirrors the paper form.
+    groups = {label: [] for _, label in GoalCategory.choices}
+    for choice in form["goals"]:
+        goal = choice.data["value"].instance  # ModelChoiceIteratorValue carries the Goal
+        groups[goal.get_category_display()].append((choice, goal))
+    return render(request, "tutoring/partials/goals.html", {"a": assignment, "form": form, "groups": groups})
+
+
+@role_required(Role.TUTOR)
+def update_schedule(request, pk):
+    assignment = _own_assignment(request, pk)
+    form = ScheduleForm(request.POST or None, instance=assignment)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return _done()
+    return render(request, "tutoring/partials/schedule.html", {"a": assignment, "form": form})
+
+
+@role_required(Role.TUTOR)
+def end_tutoring(request, pk):
+    assignment = _own_assignment(request, pk)
+    form = EndForm(request.POST or None, instance=assignment)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return _done()
+    return render(request, "tutoring/partials/end.html", {"a": assignment, "form": form})
